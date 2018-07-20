@@ -209,8 +209,10 @@ impl<I> Iterator for UntilIter<I>
                 Err(e) => Some(Err(e)),
                 Ok(tt) => if tt.is_moment() {
                     if tt.get_moment().unwrap() < &self.1 {
+                        println!("{:?} < {:?} -> true", tt.get_moment().unwrap(), self.1);
                         Some(Ok(tt))
                     } else {
+                        println!("{:?} < {:?} -> false", tt.get_moment().unwrap(), self.1);
                         None
                     }
                 } else {
