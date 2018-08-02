@@ -32,6 +32,15 @@ pub enum TimeType {
     Addition(Box<TimeType>, Box<TimeType>),
     Subtraction(Box<TimeType>, Box<TimeType>),
 
+    CheckedAddition(Box<TimeType>, Box<TimeType>),
+    CheckedSubtraction(Box<TimeType>, Box<TimeType>),
+
+    WrappingAddition(Box<TimeType>, Box<TimeType>),
+    WrappingSubtraction(Box<TimeType>, Box<TimeType>),
+
+    SaturatingAddition(Box<TimeType>, Box<TimeType>),
+    SaturatingSubtraction(Box<TimeType>, Box<TimeType>),
+
     EndOfYear(Box<TimeType>),
     EndOfMonth(Box<TimeType>),
     EndOfDay(Box<TimeType>),
@@ -50,6 +59,40 @@ impl Add for TimeType {
 impl AddAssign for TimeType {
     fn add_assign(&mut self, rhs: TimeType) {
         *self = TimeType::Addition(Box::new(self.clone()), Box::new(rhs));
+    }
+}
+
+impl CheckedAdd for TimeType {
+    fn checked_add(&self, v: &Self) -> Option<Self> {
+        TimeType::CheckedAddition(Box::new(self), Box::new(rhs))
+    }
+}
+
+impl CheckedSub for TimeType {
+    fn checked_sub(&self, v: &Self) -> Option<Self> {
+        TimeType::CheckedSubtraction(Box::new(self), Box::new(rhs))
+    }
+}
+
+impl WrappingAdd for TimeType {
+    fn wrapping_add(&self, v: &Self) -> Self {
+        TimeType::WrappingAdd(Box::new(self), Box::new(rhs))
+    }
+}
+
+impl WrappingSub for TimeType {
+    fn wrapping_sub(&self, v: &Self) -> Self {
+        TimeType::WrappingSub(Box::new(self), Box::new(rhs))
+    }
+}
+
+impl Saturating for TimeType {
+    fn saturating_add(seelf, v: Self) -> Self {
+        TimeType::SaturatingAddition(Box::new(self), Box::new(rhs))
+    }
+
+    fn saturating_sub(self, v: Self) -> Self {
+        TimeType::SaturatingSubtraction(Box::new(self), Box::new(rhs))
     }
 }
 
@@ -455,14 +498,20 @@ fn do_calculate(tt: TimeType) -> Result<TimeType> {
     use timetype::TimeType as TT;
 
     match tt {
-        TT::Addition(a, b)     => add(a, b),
-        TT::Subtraction(a, b)  => sub(a, b),
-        TT::EndOfYear(inner)   => end_of_year(*inner),
-        TT::EndOfMonth(inner)  => end_of_month(*inner),
-        TT::EndOfDay(inner)    => end_of_day(*inner),
-        TT::EndOfHour(inner)   => end_of_hour(*inner),
-        TT::EndOfMinute(inner) => end_of_minute(*inner),
-        x                      => Ok(x)
+        TT::Addition(a, b)              => add(a, b),
+        TT::Subtraction(a, b)           => sub(a, b),
+        TT::CheckedAddition(a, b)       => checked_add(a, b),
+        TT::CheckedSubtraction(a, b)    => checked_sub(a, b),
+        TT::WrappingAddition(a, b)      => wrapping_add(a, b),
+        TT::WrappingSubtraction(a, b)   => wrapping_sub(a, b),
+        TT::SaturatingAddition(a, b)    => saturating_add(a, b),
+        TT::SaturatingSubtraction(a, b) => saturating_sub(a, b),
+        TT::EndOfYear(inner)            => end_of_year(*inner),
+        TT::EndOfMonth(inner)           => end_of_month(*inner),
+        TT::EndOfDay(inner)             => end_of_day(*inner),
+        TT::EndOfHour(inner)            => end_of_hour(*inner),
+        TT::EndOfMinute(inner)          => end_of_minute(*inner),
+        x                               => Ok(x)
     }
 }
 
